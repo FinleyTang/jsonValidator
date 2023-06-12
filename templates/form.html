@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON Validator</title>
+</head>
+<body>
+    <h1>JSON Validator</h1>
+    <form method="POST" id="json-form">
+        {{ form.csrf_token }}
+        {{ form.json_data.label }} {{ form.json_data }}
+        {% if form.json_data.errors %}
+            <ul>
+            {% for error in form.json_data.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {{ form.submit }}
+    </form>
+    <div id="result"></div>
+    <script type="text/javascript">
+        const form = document.getElementById('json-form');
+        const result = document.getElementById('result');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            fetch('/', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    result.innerHTML = '<p style="color: green;">JSON is valid!</p>';
+                } else {
+                    result.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                result.innerHTML = `<p style="color: red;">Request failed: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
+
